@@ -85,6 +85,34 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(46, 68, 24, 0.2), inset 0 1px 0 rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.title-grid-card:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 24px rgba(46, 68, 24, 0.35);
+}
+
+/* Zoomed photo overlay */
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.zoom-photo {
+  max-width: 70vw;
+  max-height: 80vh;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  cursor: default;
 }
 
 .title-grid-photo {
@@ -191,6 +219,38 @@
 
 .swipe-card-photo img,
 .swipe-card-photo .profile-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* Before photo sits as the base layer */
+.swipe-card-photo .before-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* After photo fades in on top */
+.after-photo-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.after-photo-overlay.visible {
+  opacity: 1;
+}
+
+.after-photo-overlay img,
+.after-photo-overlay .profile-photo-placeholder {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -687,7 +747,7 @@
 }
 
 .bracket-card .profile-photo-container {
-  height: 200px;
+  height: 340px;
 }
 
 .bracket-card .profile-info {
@@ -907,9 +967,30 @@
   overflow: hidden;
   box-shadow: 0 12px 40px rgba(30, 44, 15, 0.4);
   border: 4px solid rgba(255,255,255,0.5);
+  position: relative;
 }
 
-.bonus-photo-card img {
+.bonus-photo-card img,
+.bonus-photo-card .bonus-before {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.bonus-after-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.bonus-after-overlay.visible {
+  opacity: 1;
+}
+
+.bonus-after-overlay img {
   width: 100%;
   height: 100%;
   object-fit: cover;

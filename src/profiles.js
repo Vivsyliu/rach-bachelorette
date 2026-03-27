@@ -18,6 +18,7 @@ const profiles = [
     occupation: "Marketing Manager",
     pickupLine: "Are you a fine wine? Because I'd like to keep you in my cellar forever. Wait, that came out wrong.",
     photo: "/photos/Bei.JPG",
+    photoBefore: "/photos/Bei-before.JPG",
   },
   {
     id: 2,
@@ -27,6 +28,7 @@ const profiles = [
     occupation: "Product Designer",
     pickupLine: "Are you brie? Because you're looking extra soft tonight.",
     photo: "/photos/Bhajie.jpg",
+    photoBefore: "/photos/Bhajie-before.JPG",
   },
   {
     id: 3,
@@ -36,6 +38,7 @@ const profiles = [
     occupation: "Software Engineer",
     pickupLine: "I'd spell out my love for you, but it would take all night. Want to get started?",
     photo: "/photos/Cindy.jpg",
+    photoBefore: "/photos/Cindy-before.JPG",
   },
   {
     id: 4,
@@ -45,6 +48,7 @@ const profiles = [
     occupation: "Veterinarian",
     pickupLine: "My dog likes you, and honestly that's the only reference check I need.",
     photo: "/photos/Francesca.jpg",
+    photoBefore: "/photos/Francesca-before.JPG",
   },
   {
     id: 5,
@@ -54,6 +58,7 @@ const profiles = [
     occupation: "Financial Analyst",
     pickupLine: "Are you an avocado? Because you're the good kind of extra.",
     photo: "/photos/Jenny.PNG",
+    photoBefore: "/photos/Jenny-before.PNG",
   },
   {
     id: 6,
@@ -63,6 +68,7 @@ const profiles = [
     occupation: "Yoga Instructor",
     pickupLine: "I'm really flexible — with my schedule, I mean. Okay, also physically.",
     photo: "/photos/Kaeley.jpg",
+    photoBefore: "/photos/Kaeley-before.jpg",
   },
   {
     id: 7,
@@ -72,6 +78,7 @@ const profiles = [
     occupation: "Event Planner",
     pickupLine: "Do you believe in love at first dance, or should I do The Worm again?",
     photo: "/photos/Kim.JPG",
+    photoBefore: "/photos/Kim-before.JPG",
   },
   {
     id: 8,
@@ -81,6 +88,7 @@ const profiles = [
     occupation: "Journalist",
     pickupLine: "I've done a background check and you seem great. Kidding! ...mostly.",
     photo: "/photos/Liv.jpg",
+    photoBefore: "/photos/Liv-before.jpg",
   },
   {
     id: 9,
@@ -90,6 +98,7 @@ const profiles = [
     occupation: "Interior Designer",
     pickupLine: "Are you a succulent? Because I want to put you on my windowsill and admire you from a distance.",
     photo: "/photos/Lygia.PNG",
+    photoBefore: "/photos/Lygia-before.JPG",
   },
   {
     id: 10,
@@ -99,6 +108,7 @@ const profiles = [
     occupation: "Nurse Practitioner",
     pickupLine: "I'm already crying just looking at you. In a good way, I promise.",
     photo: "/photos/Myriam.jpg",
+    photoBefore: "/photos/Myriam-before.jpg",
   },
   {
     id: 11,
@@ -108,6 +118,7 @@ const profiles = [
     occupation: "Architect",
     pickupLine: "I'd never want to escape a room if you were in it with me.",
     photo: "/photos/Vivian.jpg",
+    photoBefore: "/photos/Vivian-before.jpg",
   },
 ];
 

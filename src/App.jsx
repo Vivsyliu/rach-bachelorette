@@ -106,8 +106,70 @@ const sounds = {
         });
       } catch (e) {}
     }
+  },
+  yay: {
+    play: () => {
+      try {
+        const ctx = getAudioCtx();
+        const t = ctx.currentTime;
+        // Bubbly ascending yay — fast happy arpeggio
+        [523, 659, 784, 1047, 1319, 1568].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, t + i * 0.07);
+          gain.gain.linearRampToValueAtTime(0.18, t + i * 0.07 + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.07 + 0.35);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(t + i * 0.07);
+          osc.stop(t + i * 0.07 + 0.35);
+        });
+      } catch (e) {}
+    }
   }
 };
+
+// ── Background Music ──
+let _bgTimeout = null;
+function playBgLoop() {
+  try {
+    const ctx = getAudioCtx();
+    const master = ctx.createGain();
+    master.gain.value = 0.055;
+    master.connect(ctx.destination);
+    // Lounge chord progression: Cmaj7 → Am7 → Fmaj7 → G7
+    const prog = [
+      [130.81, 196.00, 246.94, 329.63],
+      [110.00, 164.81, 220.00, 261.63],
+      [87.31,  130.81, 174.61, 220.00],
+      [98.00,  146.83, 196.00, 246.94],
+    ];
+    let t = ctx.currentTime + 0.05;
+    const barDur = 2.2;
+    prog.forEach((chord, ci) => {
+      chord.forEach((freq, fi) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = fi === 0 ? 'triangle' : 'sine';
+        osc.frequency.value = freq;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(1, t + 0.25);
+        g.gain.setValueAtTime(1, t + barDur - 0.25);
+        g.gain.linearRampToValueAtTime(0, t + barDur);
+        osc.connect(g).connect(master);
+        osc.start(t);
+        osc.stop(t + barDur);
+      });
+      t += barDur;
+    });
+    const total = prog.length * barDur;
+    _bgTimeout = setTimeout(playBgLoop, (total - 0.1) * 1000);
+  } catch (e) {}
+}
+function stopBgMusic() {
+  if (_bgTimeout) { clearTimeout(_bgTimeout); _bgTimeout = null; }
+}
 
 // ── Phases ──
 const PHASE = {
@@ -231,8 +293,27 @@ function App() {
   const [finalWinner, setFinalWinner] = useState(null);
   const [eliminated, setEliminated] = useState([]);
   const [showBonusPhotos, setShowBonusPhotos] = useState(false);
+  const [showBonusAfter, setShowBonusAfter] = useState(false);
+  const [zoomedPhoto, setZoomedPhoto] = useState(null);
+  const [showAfterPhoto, setShowAfterPhoto] = useState(false);
 
   const isAnimating = useRef(false);
+
+  // Start background music once on mount (after first user gesture)
+  useEffect(() => {
+    const startMusic = () => {
+      playBgLoop();
+      window.removeEventListener('click', startMusic);
+      window.removeEventListener('keydown', startMusic);
+    };
+    window.addEventListener('click', startMusic, { once: true });
+    window.addEventListener('keydown', startMusic, { once: true });
+    return () => {
+      stopBgMusic();
+      window.removeEventListener('click', startMusic);
+      window.removeEventListener('keydown', startMusic);
+    };
+  }, []);
 
   // Debug: expose controls for testing
   useEffect(() => {
@@ -279,7 +360,7 @@ function App() {
           handleSwipe('right');
         }
       } else if (phase === PHASE.REVEAL) {
-        if (e.key === ' ' || e.key === 'Enter') {
+        if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
           e.preventDefault();
           handleRevealNext();
         }
@@ -294,12 +375,6 @@ function App() {
           handleBracketPick(bracketRound[bracketMatchIndex * 2]);
         } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
           handleBracketPick(bracketRound[bracketMatchIndex * 2 + 1]);
-        }
-      } else if (phase === PHASE.FINAL_MATCHUP) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          setPhase(PHASE.VICTORY);
-          sounds.victory.play();
         }
       }
     };
@@ -411,6 +486,26 @@ function App() {
     }, 600);
   }, [bracketMatchIndex, bracketRound, bracketWinners]);
 
+  // Before → After photo transition during swiping
+  useEffect(() => {
+    if (phase !== PHASE.SWIPING) return;
+    setShowAfterPhoto(false);
+    const t = setTimeout(() => setShowAfterPhoto(true), 1500);
+    return () => clearTimeout(t);
+  }, [currentIndex, phase]);
+
+  // Auto-transition from FINAL_MATCHUP to VICTORY after 2 seconds
+  useEffect(() => {
+    if (phase === PHASE.FINAL_MATCHUP) {
+      const t = setTimeout(() => {
+        setPhase(PHASE.VICTORY);
+        sounds.victory.play();
+        setTimeout(() => sounds.yay.play(), 700);
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+
   const getRoundName = () => {
     const remaining = bracketRound.length;
     if (remaining <= 2) return 'The Final';
@@ -444,7 +539,7 @@ function App() {
             </h1>
             <div className="title-grid">
               {profiles.map((p) => (
-                <div key={p.id} className="title-grid-card">
+                <div key={p.id} className="title-grid-card" onClick={() => setZoomedPhoto(p.photo)}>
                   <img src={p.photo} alt="" className="title-grid-photo" />
                 </div>
               ))}
@@ -452,6 +547,30 @@ function App() {
             <button className="start-btn" onClick={() => setPhase(PHASE.SWIPING)}>
               Start Swiping
             </button>
+
+            {/* Zoomed photo overlay */}
+            <AnimatePresence>
+              {zoomedPhoto && (
+                <motion.div
+                  className="zoom-overlay"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={() => setZoomedPhoto(null)}
+                >
+                  <motion.img
+                    src={zoomedPhoto}
+                    className="zoom-photo"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
@@ -487,10 +606,19 @@ function App() {
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               >
                 <div className="swipe-card-photo">
+                  {/* Before photo — always underneath */}
                   <ProfilePhoto
-                    photo={profiles[currentIndex]?.photo}
+                    photo={profiles[currentIndex]?.photoBefore || profiles[currentIndex]?.photo}
                     name={profiles[currentIndex]?.name}
+                    className="before-photo"
                   />
+                  {/* After photo — fades in on top after 1.5s */}
+                  <div className={`after-photo-overlay ${showAfterPhoto ? 'visible' : ''}`}>
+                    <ProfilePhoto
+                      photo={profiles[currentIndex]?.photo}
+                      name={profiles[currentIndex]?.name}
+                    />
+                  </div>
                 </div>
                 <div className="swipe-card-info">
                   <div className="swipe-card-name">{profiles[currentIndex]?.name}</div>
@@ -762,15 +890,6 @@ function App() {
               </motion.div>
             </div>
 
-            <button
-              className="reveal-next-btn"
-              onClick={() => {
-                setPhase(PHASE.VICTORY);
-                sounds.victory.play();
-              }}
-            >
-              Reveal the Winner
-            </button>
           </motion.div>
         )}
 
@@ -808,7 +927,7 @@ function App() {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 1.2, type: 'spring', stiffness: 200 }}
-              onClick={() => setShowBonusPhotos(true)}
+              onClick={() => { setShowBonusPhotos(true); setShowBonusAfter(false); setTimeout(() => setShowBonusAfter(true), 1500); }}
               style={{ cursor: 'pointer' }}
             >
               <img src="/photos/Juni.PNG" alt={PET_NAME} />
@@ -830,10 +949,16 @@ function App() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="bonus-photo-card">
-                      <img src="/photos/Rachel boy.JPG" alt="Rach Boy" />
+                      <img src="/photos/Rachel.jpg" alt="Rachel" className="bonus-before" />
+                      <div className={`bonus-after-overlay ${showBonusAfter ? 'visible' : ''}`}>
+                        <img src="/photos/Rachel boy.JPG" alt="Rachel Boy" />
+                      </div>
                     </div>
                     <div className="bonus-photo-card">
-                      <img src="/photos/Cody girl.jpg" alt="Cody Girl" />
+                      <img src="/photos/Cody-before.jpg" alt="Cody" className="bonus-before" />
+                      <div className={`bonus-after-overlay ${showBonusAfter ? 'visible' : ''}`}>
+                        <img src="/photos/Cody girl.jpg" alt="Cody Girl" />
+                      </div>
                     </div>
                   </motion.div>
                 </motion.div>
