@@ -131,44 +131,18 @@ const sounds = {
 };
 
 // ── Background Music ──
-let _bgTimeout = null;
+let _bgAudio = null;
 function playBgLoop() {
   try {
-    const ctx = getAudioCtx();
-    const master = ctx.createGain();
-    master.gain.value = 0.055;
-    master.connect(ctx.destination);
-    // Lounge chord progression: Cmaj7 → Am7 → Fmaj7 → G7
-    const prog = [
-      [130.81, 196.00, 246.94, 329.63],
-      [110.00, 164.81, 220.00, 261.63],
-      [87.31,  130.81, 174.61, 220.00],
-      [98.00,  146.83, 196.00, 246.94],
-    ];
-    let t = ctx.currentTime + 0.05;
-    const barDur = 2.2;
-    prog.forEach((chord, ci) => {
-      chord.forEach((freq, fi) => {
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
-        osc.type = fi === 0 ? 'triangle' : 'sine';
-        osc.frequency.value = freq;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(1, t + 0.25);
-        g.gain.setValueAtTime(1, t + barDur - 0.25);
-        g.gain.linearRampToValueAtTime(0, t + barDur);
-        osc.connect(g).connect(master);
-        osc.start(t);
-        osc.stop(t + barDur);
-      });
-      t += barDur;
-    });
-    const total = prog.length * barDur;
-    _bgTimeout = setTimeout(playBgLoop, (total - 0.1) * 1000);
+    if (_bgAudio) return;
+    _bgAudio = new Audio('/photos/Sky-Drifter_AdobeStock_1874446543.wav');
+    _bgAudio.loop = true;
+    _bgAudio.volume = 0.35;
+    _bgAudio.play();
   } catch (e) {}
 }
 function stopBgMusic() {
-  if (_bgTimeout) { clearTimeout(_bgTimeout); _bgTimeout = null; }
+  if (_bgAudio) { _bgAudio.pause(); _bgAudio = null; }
 }
 
 // ── Phases ──

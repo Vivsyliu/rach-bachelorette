@@ -18,7 +18,7 @@ const profiles = [
     occupation: "Marketing Manager",
     pickupLine: "Are you a fine wine? Because I'd like to keep you in my cellar forever. Wait, that came out wrong.",
     photo: "/photos/Bei.JPG",
-    photoBefore: "/photos/Bei-before.JPG",
+    photoBefore: "/photos/Bei-before.jpg",
   },
   {
     id: 2,
@@ -58,7 +58,7 @@ const profiles = [
     occupation: "Financial Analyst",
     pickupLine: "Are you an avocado? Because you're the good kind of extra.",
     photo: "/photos/Jenny.PNG",
-    photoBefore: "/photos/Jenny-before.PNG",
+    photoBefore: "/photos/Jenny-before.jpg",
   },
   {
     id: 6,
@@ -78,7 +78,7 @@ const profiles = [
     occupation: "Event Planner",
     pickupLine: "Do you believe in love at first dance, or should I do The Worm again?",
     photo: "/photos/Kim.JPG",
-    photoBefore: "/photos/Kim-before.JPG",
+    photoBefore: "/photos/Kim-before.jpg",
   },
   {
     id: 8,
