@@ -747,7 +747,7 @@
 }
 
 .bracket-card .profile-photo-container {
-  height: 340px;
+  height: 420px;
 }
 
 .bracket-card .profile-info {
@@ -930,10 +930,12 @@
 }
 
 .victory-dog img {
-  width: 100px;
+  width: 110px;
   height: auto;
   transition: transform 0.2s ease;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+  mix-blend-mode: multiply;
+  background: transparent;
 }
 
 .victory-dog:hover img {
