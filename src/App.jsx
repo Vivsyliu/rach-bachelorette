@@ -131,18 +131,21 @@ const sounds = {
 };
 
 // ── Background Music ──
-let _bgAudio = null;
+// Preload immediately so it's ready the moment user first clicks
+const _bgAudio = new Audio('/music.m4a');
+_bgAudio.loop = true;
+_bgAudio.volume = 0.35;
+_bgAudio.preload = 'auto';
+
 function playBgLoop() {
   try {
-    if (_bgAudio) return;
-    _bgAudio = new Audio('/music.m4a');
-    _bgAudio.loop = true;
-    _bgAudio.volume = 0.35;
+    if (!_bgAudio.paused) return;
     _bgAudio.play();
   } catch (e) {}
 }
 function stopBgMusic() {
-  if (_bgAudio) { _bgAudio.pause(); _bgAudio = null; }
+  _bgAudio.pause();
+  _bgAudio.currentTime = 0;
 }
 
 // ── Phases ──
