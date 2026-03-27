@@ -509,6 +509,7 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
+            onClick={playBgLoop}
           >
             <div className="title-icon">🍸</div>
             <h1>
